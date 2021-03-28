@@ -1,0 +1,26 @@
+const int max_iter = 500;
+
+void main(std::Texture2d palette, out vec4 Color) {
+    vec2 scale = vec2(3.0);
+    vec2 center = vec2(1.5, 1.5);
+    vec2 z = fragment(std::getVertexTexCoord()) * scale - center;
+    vec2 res = std::getRenderTargetSize();
+   
+    z.y *= res.y / res.x;
+    vec2 c = vec2(-0.7269, 0.1888);
+    
+    float cycle = std::getTime();
+    vec2 delta = vec2(cos(cycle) + sin(cycle), sin(cycle) - cos(cycle));
+    c += delta * 0.01;
+    
+    int i;
+    for(i = 0; i < max_iter; i++) {
+	//z = z^2 + c
+        vec2 temp = vec2(z.x * z.x - z.y * z.y + c.x, 2. * z.x * z.y + c.y);
+        if(temp.x > 2. || temp.y > 2.) break;
+        z = temp;
+    }
+    
+    float degree = (i == max_iter) ? 0.5 : float(i) / float(max_iter);
+    Color = palette.sample(vec2(degree));
+}
